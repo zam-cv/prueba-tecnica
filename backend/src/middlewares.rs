@@ -23,6 +23,7 @@ pub async fn auth(
                 return Ok(req.into_response(response).map_into_right_body());
             }
 
+            // Insert the user id into the request extensions
             req.extensions_mut().insert(claims.id);
             return Ok(next.call(req).await?.map_into_left_body());
         }
