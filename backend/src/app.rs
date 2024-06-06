@@ -1,11 +1,6 @@
 use crate::controllers;
-use actix_web::{get, middleware::Logger, web, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use std::env;
-
-#[get("/")]
-async fn index() -> &'static str {
-    "Hello, world!"
-}
 
 pub async fn app() -> std::io::Result<()> {
     HttpServer::new(move || {

@@ -1,6 +1,9 @@
 use dotenv::dotenv;
 
 mod app;
+mod utils;
+mod config;
+mod models;
 mod controllers;
 
 #[actix_web::main]
