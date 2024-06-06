@@ -1,5 +1,6 @@
-use crate::{database::Database, models, utils, config};
-use actix_web::{post, web, HttpResponse, Responder};
+use crate::{config, database::Database, middlewares, models, utils};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web_lab::middleware::from_fn;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -62,14 +63,25 @@ async fn signin(
     HttpResponse::BadRequest().body("Invalid credentials")
 }
 
-#[post("/verify")]
-async fn verify() -> impl Responder {
-    HttpResponse::Ok().body("Verify")
+#[get("/verify")]
+async fn verify(req: HttpRequest, database: web::Data<Database>) -> impl Responder {
+    if let Some(id) = req.extensions().get::<i32>() {
+        // Get the user by id
+        if let Ok(Some(_)) = database.get_user_by_id(*id).await {
+            return HttpResponse::Ok().finish();
+        }
+    }
+
+    HttpResponse::Unauthorized().finish()
 }
 
 pub fn routes() -> actix_web::Scope {
     web::scope("/auth")
         .service(register)
         .service(signin)
-        .service(verify)
+        .service(
+            web::scope("")
+                .wrap(from_fn(middlewares::auth))
+                .service(verify),
+        )
 }

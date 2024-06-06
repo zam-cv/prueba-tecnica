@@ -20,3 +20,4 @@ serde = { version = "1.0.203", features = ["derive"] }
 validator = { version = "0.18.1", features = ["derive"] }
 diesel = { version = "2.2", features = ["postgres", "r2d2", "chrono", "uuid", "numeric"] }
 lazy_static = "1.4.0"
+actix-web-lab = "0.20.2"

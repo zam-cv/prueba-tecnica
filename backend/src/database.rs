@@ -73,4 +73,9 @@ impl Database {
         })
         .await
     }
+
+    pub async fn get_user_by_id(&self, id: i32) -> anyhow::Result<Option<models::User>> {
+        self.query_wrapper(move |conn| schema::users::table.find(id).first(conn).optional())
+            .await
+    }
 }
