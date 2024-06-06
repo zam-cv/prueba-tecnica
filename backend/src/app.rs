@@ -1,11 +1,15 @@
-use crate::controllers;
+use crate::{controllers, database::Database};
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use std::env;
 
 pub async fn app() -> std::io::Result<()> {
+    // Create Database instance
+    let db = Database::new();
+
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .app_data(web::Data::new(db.clone()))
             .service(web::scope("/api").service(controllers::auth::routes()))
     })
     // Use the HOST and PORT environment variables to bind the server

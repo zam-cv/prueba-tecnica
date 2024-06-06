@@ -18,3 +18,5 @@ rand = "0.8.5"
 rust-argon2 = "2.1.0"
 serde = { version = "1.0.203", features = ["derive"] }
 validator = { version = "0.18.1", features = ["derive"] }
+diesel = { version = "2.2", features = ["postgres", "r2d2", "chrono", "uuid", "numeric"] }
+lazy_static = "1.4.0"
