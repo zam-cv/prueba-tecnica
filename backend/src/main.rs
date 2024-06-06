@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 
 mod app;
+mod controllers;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
