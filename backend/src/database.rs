@@ -93,4 +93,9 @@ impl Database {
         self.query_wrapper(move |conn| schema::rooms::table.count().get_result(conn))
             .await
     }
+
+    pub async fn get_rooms(&self) -> anyhow::Result<Vec<models::Room>> {
+        self.query_wrapper(move |conn| schema::rooms::table.load(conn))
+            .await
+    }
 }
