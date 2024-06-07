@@ -1,4 +1,9 @@
-use crate::{config, controllers, database::Database, middlewares};
+use crate::{
+    config, controllers,
+    database::Database,
+    middlewares,
+    socket::{self, server::Server},
+};
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_lab::middleware::from_fn;
@@ -7,9 +12,16 @@ use std::env;
 pub async fn app() -> std::io::Result<()> {
     // Create Database instance
     let database = Database::new();
+    log::info!("Database connection established");
 
     // Configure the database
     config::configure_database(&database).await;
+    log::info!("Database configured");
+
+    // Create the socket server
+    let (mut socket_server, server_tx) = Server::new(database.clone());
+    tokio::spawn(async move { socket_server.run().await });
+    log::info!("Socket server started");
 
     HttpServer::new(move || {
         App::new()
@@ -17,8 +29,16 @@ pub async fn app() -> std::io::Result<()> {
             .wrap(Cors::permissive())
             .wrap(Logger::default())
             // Resources
+            .app_data(web::Data::new(server_tx.clone()))
             .app_data(web::Data::new(database.clone()))
             // Routes
+            .route(
+                "/ws/",
+                web::get()
+                    .to(socket::server_index)
+                    // Wrap the websocket route with the user_auth middleware
+                    .wrap(from_fn(middlewares::auth)),
+            )
             .service(
                 web::scope("/api")
                     .service(controllers::auth::routes())
