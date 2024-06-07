@@ -7,7 +7,6 @@ export default function Unprotected({ children }: { children: React.ReactNode })
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    console.log(isAuthenticated);
     if (isAuthenticated) {
       navigate("/panel");
     }

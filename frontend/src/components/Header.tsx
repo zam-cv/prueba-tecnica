@@ -1,3 +1,14 @@
+import { useAuth } from "../hooks/useAuth";
+
 export default function Header() {
-  return <div>Header</div>
+  const { signout } = useAuth();
+
+  return (
+    <div>
+      <div>Header</div>
+      <div>
+        <button onClick={signout}>Cerrar sesión</button>
+      </div>
+    </div>
+  );
 }

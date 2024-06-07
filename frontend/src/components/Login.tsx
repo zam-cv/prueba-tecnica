@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Login() {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const { signin } = useAuth();
   const navigate = useNavigate();
 
   function HandleLogin() {
@@ -15,15 +16,7 @@ export default function Login() {
       return;
     }
 
-    api.auth
-      .signin(email, password)
-      .then((data) => {
-        localStorage.setItem("token", data);
-        navigate("/panel");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    signin(email, password, navigate);
   }
 
   return (

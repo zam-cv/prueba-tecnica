@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext, AuthContextType } from "../contexts/AuthContext";
+import { NavigateFunction } from "react-router-dom";
 import api from "../utils/api";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -35,5 +36,28 @@ export function useProvideAuth() {
     }
   }, []);
 
-  return { isLoading, isAuthenticated };
+  function signout() {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+  }
+
+  function signin(email: string, password: string, navigate: NavigateFunction) {
+    setIsLoading(true);
+
+    api.auth
+      .signin(email, password)
+      .then((data) => {
+        localStorage.setItem("token", data);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        navigate("/panel");
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        setIsAuthenticated(false);
+        console.error(error);
+      });
+  }
+
+  return { isLoading, isAuthenticated, signout, signin };
 }
