@@ -5,7 +5,7 @@ export default function Header() {
   const { signout } = useAuth();
 
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] p-5 bg-background-dark">
+    <div className="grid grid-cols-[auto_1fr_auto] p-5 pt-6 bg-background-dark">
       <h2 className="font-bold text-lg">The Cracking the Code</h2>
       <div className="flex items-center px-7">
         <Link to="/rooms" className="cursor-pointer">

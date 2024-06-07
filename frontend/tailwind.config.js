@@ -10,7 +10,7 @@ export default {
         'background': '#0b121f',
         'background-light': '#293447',
         'background-dark': '#182232',
-        'primary': '#d2292b',
+        'primary': '#ff6668',
         'secondary': '#8899b6',
         'opacity': '#ffffff14',
       },
