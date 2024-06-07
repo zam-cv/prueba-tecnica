@@ -7,3 +7,9 @@ export async function post<T, B>(path: string, body: B, withConfig = true) {
     .post(`${API_URL}${path}`, body, withConfig ? getConfig() : undefined)
     .then(({ data }: { data: T }) => data);
 }
+
+export async function get<T>(path: string, withConfig = true) {
+  return axios
+    .get(`${API_URL}${path}`, withConfig ? getConfig() : undefined)
+    .then(({ data }: { data: T }) => data);
+}

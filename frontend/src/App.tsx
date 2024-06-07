@@ -1,7 +1,11 @@
+import { AuthProvider } from "./hooks/useAuth";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
+
+// security
 import Protected from "./components/Protected";
+import Unprotected from "./components/Unprotected";
 
 // pages
 import Panel from "./components/Panel";
@@ -12,22 +16,38 @@ import "./App.css";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index path="/login" element={<Login />} />
-          <Route
-            path="/panel"
-            element={
-              <Protected>
-                <Panel />
-              </Protected>
-            }
-          />
-          <Route path="/register" element={<Register />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route
+              index
+              element={
+                <Unprotected>
+                  <Login />
+                </Unprotected>
+              }
+            />
+            <Route
+              path="/panel"
+              element={
+                <Protected>
+                  <Panel />
+                </Protected>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <Unprotected>
+                  <Register />
+                </Unprotected>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

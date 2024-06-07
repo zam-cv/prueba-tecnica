@@ -28,7 +28,7 @@ export default function Register() {
     api.auth
       .register(username, email, password)
       .then(() => {
-        navigate("/login");
+        navigate("/");
       })
       .catch((error) => {
         console.error(error);
@@ -59,7 +59,7 @@ export default function Register() {
       </div>
       <div>
         <div>¿Ya tienes cuenta?</div>
-        <Link to="/login">Iniciar sesión</Link>
+        <Link to="/">Iniciar sesión</Link>
       </div>
     </div>
   );
