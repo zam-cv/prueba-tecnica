@@ -8,7 +8,7 @@ export default function Unprotected({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/panel");
+      navigate("/rooms");
     }
   }, [isAuthenticated, navigate]);
 

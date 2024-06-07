@@ -1,5 +1,14 @@
 import { post, get } from "./methods";
 
+export interface Room {
+  id: number;
+  title: string;
+  description: string;
+  front_image: string;
+  image: string;
+  duration: number;
+}
+
 export default {
   auth: {
     register: (username: string, email: string, password: string): Promise<void> => {
@@ -12,4 +21,9 @@ export default {
       return get("/auth/verify");
     }
   },
+  rooms: {
+    getRooms: (): Promise<Room[]> => {
+      return get("/rooms");
+    }
+  }
 };

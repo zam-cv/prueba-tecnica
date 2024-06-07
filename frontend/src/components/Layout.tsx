@@ -12,7 +12,7 @@ export default function Layout() {
   return (
     <div className="h-full grid grid-rows-[auto_1fr] overflow-hidden">
       <div>{isAuthenticated ? <Header /> : <div></div>}</div>
-      <div className="overflow-auto">
+      <div className="overflow-auto bg-background">
         <Outlet />
       </div>
     </div>

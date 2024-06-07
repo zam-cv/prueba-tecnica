@@ -50,7 +50,7 @@ export function useProvideAuth() {
         localStorage.setItem("token", data);
         setIsAuthenticated(true);
         setIsLoading(false);
-        navigate("/panel");
+        navigate("/rooms");
       })
       .catch((error) => {
         setIsLoading(false);

@@ -8,9 +8,10 @@ import Protected from "./components/Protected";
 import Unprotected from "./components/Unprotected";
 
 // pages
-import Panel from "./components/Panel";
+import Rooms from "./components/Rooms";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import Room from "./components/Room";
 
 import "./App.css";
 
@@ -29,10 +30,10 @@ function App() {
               }
             />
             <Route
-              path="/panel"
+              path="/rooms"
               element={
                 <Protected>
-                  <Panel />
+                  <Rooms />
                 </Protected>
               }
             />
@@ -42,6 +43,14 @@ function App() {
                 <Unprotected>
                   <Register />
                 </Unprotected>
+              }
+            />
+            <Route
+              path="/room/:id"
+              element={
+                <Protected>
+                  <Room />
+                </Protected>
               }
             />
           </Route>

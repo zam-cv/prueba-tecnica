@@ -1,6 +1,11 @@
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { handleKeyDown, handleEnter } from "../utils";
 import api from "../utils/api";
+import Input from "./Input";
+import Button from "./Button";
+import Label from "./Label";
+import Logo from "../assets/logo.svg";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -36,30 +41,48 @@ export default function Register() {
   }
 
   return (
-    <div>
-      <div>
-        <div>Crea una cuenta</div>
-        <div>
-          <div>
-            <label>Nombre de Usuario</label>
-            <input ref={usernameRef} type="text" />
-          </div>
-          <div>
-            <label>Email</label>
-            <input ref={emailRef} type="email" />
-          </div>
-          <div>
-            <label>Contraseña</label>
-            <input ref={passwordRef} type="password" />
-          </div>
-          <div>
-            <button onClick={handleRegister}>Registrarte</button>
-          </div>
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="flex flex-col gap-5 max-md:container w-[600px] p-7">
+        <div className="flex gap-5 items-center">
+          <img src={Logo} alt="Logo" width="50px" />
+          <h2 className="font-bold text-lg">The Cracking the Code</h2>
         </div>
-      </div>
-      <div>
-        <div>¿Ya tienes cuenta?</div>
-        <Link to="/">Iniciar sesión</Link>
+        <div className="flex flex-col gap-10 bg-background-dark p-10 rounded-md">
+          <div className="text-xl font-bold">Crea una cuenta</div>
+          <div className="flex flex-col gap-7">
+            <div className="flex flex-col gap-2">
+              <Label>Nombre de Usuario</Label>
+              <Input
+                ref={usernameRef}
+                type="text"
+                onKeyDown={(e) => handleKeyDown(e, emailRef)}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Correo electrónico</Label>
+              <Input
+                ref={emailRef}
+                type="email"
+                onKeyDown={(e) => handleKeyDown(e, passwordRef)}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Contraseña</Label>
+              <Input
+                ref={passwordRef}
+                type="password"
+                onKeyDown={(e) => handleEnter(e, handleRegister)}
+              />
+            </div>
+          </div>
+          <Button onClick={handleRegister}>Registrarte</Button>
+        </div>
+        <div className="flex gap-2">
+          <div className="text-secondary">¿Ya tienes cuenta?</div>
+          <Link to="/" className="text-primary cursor-pointer">
+            Iniciar sesión
+          </Link>
+        </div>
       </div>
     </div>
   );
