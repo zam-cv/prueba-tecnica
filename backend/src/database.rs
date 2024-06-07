@@ -78,4 +78,19 @@ impl Database {
         self.query_wrapper(move |conn| schema::users::table.find(id).first(conn).optional())
             .await
     }
+
+    pub async fn create_room(&self, new_room: models::Room) -> anyhow::Result<i32> {
+        self.query_wrapper(move |conn| {
+            diesel::insert_into(schema::rooms::table)
+                .values(&new_room)
+                .returning(schema::rooms::id)
+                .get_result(conn)
+        })
+        .await
+    }
+
+    pub async fn get_rooms_count(&self) -> anyhow::Result<i64> {
+        self.query_wrapper(move |conn| schema::rooms::table.count().get_result(conn))
+            .await
+    }
 }

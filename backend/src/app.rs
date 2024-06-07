@@ -1,11 +1,14 @@
-use crate::{controllers, database::Database};
+use crate::{controllers, database::Database, config};
 use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use std::env;
 
 pub async fn app() -> std::io::Result<()> {
     // Create Database instance
-    let db = Database::new();
+    let database = Database::new();
+
+    // Configure the database
+    config::configure_database(&database).await;
 
     HttpServer::new(move || {
         App::new()
@@ -13,7 +16,7 @@ pub async fn app() -> std::io::Result<()> {
             .wrap(Cors::permissive())
             .wrap(Logger::default())
             // Resources
-            .app_data(web::Data::new(db.clone()))
+            .app_data(web::Data::new(database.clone()))
             // Routes
             .service(web::scope("/api").service(controllers::auth::routes()))
     })

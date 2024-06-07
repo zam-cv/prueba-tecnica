@@ -1,3 +1,5 @@
 pub use user::User;
+pub use room::Room;
 
-pub mod user;
+mod user;
+mod room;
