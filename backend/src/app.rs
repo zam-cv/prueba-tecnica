@@ -49,9 +49,12 @@ pub async fn app() -> std::io::Result<()> {
                             .service(controllers::rooms::routes()),
                     ),
             )
+            // Static files
+            .service(fs::Files::new("/data/", "./data/").show_files_listing())
             .service(
-                // Static files
-                fs::Files::new("/data/", "./data/").show_files_listing(),
+                fs::Files::new("/", "./page/")
+                    .show_files_listing()
+                    .index_file("index.html"),
             )
     })
     // Use the HOST and PORT environment variables to bind the server
