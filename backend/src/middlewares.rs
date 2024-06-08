@@ -10,12 +10,35 @@ pub async fn auth(
     req: ServiceRequest,
     next: Next<impl MessageBody + 'static>,
 ) -> Result<ServiceResponse<impl MessageBody>, Error> {
-    if let Some(Some(token)) = req
+    let token = if let Some(header) = req
         .headers()
         // Get the Authorization header
         .get("Authorization")
-        .map(|t| t.to_str().ok().map(|s| s.to_string()))
     {
+        header.to_str().map(|s| s.to_string()).ok()
+    } else {
+        // support for websockets
+        req.headers()
+            .get(actix_web::http::header::SEC_WEBSOCKET_PROTOCOL)
+            .and_then(|header| {
+                header
+                    .to_str()
+                    .map(|s| {
+                        let parts: Vec<&str> = s.split(", ").collect();
+
+                        if parts.len() == 2 {
+                            let token = parts[1];
+                            return Some(token.to_string());
+                        }
+
+                        None
+                    })
+                    .ok()
+                    .flatten()
+            })
+    };
+
+    if let Some(token) = token {
         if let Ok(claims) = utils::decode_token(&config::SECRET_KEY, &token) {
             // Check if the token has expired
             if claims.exp < chrono::Utc::now().timestamp() as usize {

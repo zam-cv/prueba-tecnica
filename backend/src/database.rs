@@ -108,4 +108,19 @@ impl Database {
         })
         .await
     }
+
+    pub async fn get_room_info(&self, id: i32) -> anyhow::Result<Option<(String, String, i32)>> {
+        self.query_wrapper(move |conn| {
+            schema::rooms::table
+                .select((
+                    schema::rooms::title,
+                    schema::rooms::image,
+                    schema::rooms::duration,
+                ))
+                .filter(schema::rooms::id.eq(id))
+                .first(conn)
+                .optional()
+        })
+        .await
+    }
 }

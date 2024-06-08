@@ -26,6 +26,10 @@ export default function Timer({ duration }: { duration: number }) {
   const [timeLeft, setTimeLeft] = useState(duration);
 
   useEffect(() => {
+    setTimeLeft(duration);
+  }, [duration]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       if (timeLeft <= 0) {
         clearInterval(interval);

@@ -67,12 +67,18 @@ impl Server {
             return;
         }
 
-        if let Ok(state) = State::new(*user_id, *room_id, addr.clone()).await {
-            self.sessions.insert(*user_id, state);
-        } else {
-            log::error!("Failed to get user: {}", user_id);
-            addr.do_send(Response::Stop);
+        if let Ok(Some(data)) = self.database.get_room_info(*room_id).await {
+            if let Ok(state) = State::new(*user_id, *room_id, addr.clone()).await {
+                if let Ok(info) = serde_json::to_string(&data) {
+                    addr.do_send(Response::String(info));
+                    self.sessions.insert(*user_id, state);
+                    return;
+                }
+            }
         }
+
+        log::debug!("Failed to get room info: {}", room_id);
+        addr.do_send(Response::Stop);
     }
 
     async fn disconnect(&mut self, user_id: &i32) {
