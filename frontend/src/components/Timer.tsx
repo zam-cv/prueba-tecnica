@@ -22,24 +22,35 @@ export function Square({
 }
 
 // duration is in seconds
-export default function Timer({ duration }: { duration: number }) {
+export default function Timer({ duration, pause }: { duration: number, pause: boolean }) {
+  const [startTime, setStartTime] = useState(Date.now());
   const [timeLeft, setTimeLeft] = useState(duration);
 
   useEffect(() => {
+    setStartTime(Date.now());
     setTimeLeft(duration);
   }, [duration]);
 
   useEffect(() => {
+    if (pause) {
+      return;
+    }
+
     const interval = setInterval(() => {
-      if (timeLeft <= 0) {
+      const currentTime = Date.now();
+      const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+      const newTimeLeft = duration - elapsedTime;
+
+      if (newTimeLeft <= 0) {
         clearInterval(interval);
+        setTimeLeft(0);
       } else {
-        setTimeLeft(timeLeft - 1);
+        setTimeLeft(newTimeLeft);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft]);
+  }, [startTime, duration, pause]);
 
   const hours = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
@@ -48,18 +59,9 @@ export default function Timer({ duration }: { duration: number }) {
   return (
     <div className="flex justify-center">
       <div className="flex gap-5 text-xl">
-        <Square
-          value={hours.toString().padStart(2, "0")}
-          description={"Hora" + (hours > 1 ? "s" : "")}
-        />
-        <Square
-          value={minutes.toString().padStart(2, "0")}
-          description={"Minuto" + (minutes > 1 ? "s" : "")}
-        />
-        <Square
-          value={seconds.toString().padStart(2, "0")}
-          description={"Segundo" + (seconds > 1 ? "s" : "")}
-        />
+        <Square value={hours.toString().padStart(2, '0')} description={'Hora' + (hours !== 1 ? 's' : '')} />
+        <Square value={minutes.toString().padStart(2, '0')} description={'Minuto' + (minutes !== 1 ? 's' : '')} />
+        <Square value={seconds.toString().padStart(2, '0')} description={'Segundo' + (seconds !== 1 ? 's' : '')} />
       </div>
     </div>
   );

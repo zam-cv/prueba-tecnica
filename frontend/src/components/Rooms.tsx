@@ -32,7 +32,7 @@ export function Card({ room }: { room: Room }) {
           </div>
         </div>
       </div>
-      <div className="w-full h-4 bg-cyan-500"></div>
+      <div className="w-full h-3 bg-cyan-500"></div>
     </div>
   );
 }

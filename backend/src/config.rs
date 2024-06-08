@@ -1,5 +1,6 @@
 use crate::{database::Database, models};
 use lazy_static::lazy_static;
+use validator::Validate;
 use std::env;
 
 lazy_static! {
@@ -23,6 +24,7 @@ pub async fn create_rooms(database: &Database) -> anyhow::Result<()> {
     let rooms = serde_json::from_str::<Vec<models::Room>>(ROOMS)?;
 
     for room in rooms {
+        room.validate()?;
         database.create_room(room).await?;
     }
 

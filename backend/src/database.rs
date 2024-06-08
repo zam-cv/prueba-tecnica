@@ -109,15 +109,76 @@ impl Database {
         .await
     }
 
-    pub async fn get_room_info(&self, id: i32) -> anyhow::Result<Option<(String, String, i32)>> {
+    pub async fn get_room_info(&self, id: i32) -> anyhow::Result<Option<(String, String, String, i32)>> {
         self.query_wrapper(move |conn| {
             schema::rooms::table
                 .select((
                     schema::rooms::title,
                     schema::rooms::image,
+                    schema::rooms::example,
                     schema::rooms::duration,
                 ))
                 .filter(schema::rooms::id.eq(id))
+                .first(conn)
+                .optional()
+        })
+        .await
+    }
+
+    pub async fn check_room_answer(&self, room_id: i32, answer: String) -> anyhow::Result<bool> {
+        self.query_wrapper(move |conn| {
+            schema::rooms::table
+                .select(schema::rooms::answer)
+                .filter(schema::rooms::id.eq(room_id))
+                .first(conn)
+                .map(|a: String| a == answer)
+        })
+        .await
+    }
+
+    pub async fn insert_solving_time(
+        &self,
+        solving_time: models::SolvingTime,
+    ) -> anyhow::Result<()> {
+        self.query_wrapper(move |conn| {
+            if let Ok(time) = schema::solving_times::table
+                .select(schema::solving_times::time)
+                .filter(schema::solving_times::room_id.eq(solving_time.room_id))
+                .filter(schema::solving_times::user_id.eq(solving_time.user_id))
+                .first::<i32>(conn)
+            {
+                if time < solving_time.time {
+                    return Ok(());
+                }
+            }
+
+            let _ = diesel::insert_into(schema::solving_times::table)
+                .values(&solving_time)
+                .on_conflict((
+                    schema::solving_times::room_id,
+                    schema::solving_times::user_id,
+                ))
+                .do_update()
+                .set(schema::solving_times::time.eq(solving_time.time))
+                .execute(conn);
+
+            Ok(())
+        })
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn get_best_solving_time(
+        &self,
+        room_id: i32,
+    ) -> anyhow::Result<Option<(i32, String)>> {
+        self.query_wrapper(move |conn| {
+            schema::solving_times::table
+                .filter(schema::solving_times::room_id.eq(room_id))
+                .inner_join(schema::users::table)
+                .select((schema::solving_times::time, schema::users::username))
+                .order(schema::solving_times::time)
                 .first(conn)
                 .optional()
         })

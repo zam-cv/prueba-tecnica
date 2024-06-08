@@ -23,6 +23,9 @@ export default {
   rooms: {
     getRooms: (): Promise<[number, string, string, string, number][]> => {
       return get("/rooms");
+    },
+    getBestSolvingTime: (id: number): Promise<[number, string] | null> => {
+      return get(`/rooms/${id}/best_solving_time`);
     }
   }
 };
