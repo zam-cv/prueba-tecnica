@@ -5,7 +5,6 @@ export interface Room {
   title: string;
   description: string;
   front_image: string;
-  image: string;
   duration: number;
 }
 
@@ -22,7 +21,7 @@ export default {
     }
   },
   rooms: {
-    getRooms: (): Promise<Room[]> => {
+    getRooms: (): Promise<[number, string, string, string, number][]> => {
       return get("/rooms");
     }
   }

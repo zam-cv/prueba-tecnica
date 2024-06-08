@@ -1,4 +1,3 @@
-use crate::database::Database;
 use actix_web::{web, Error, HttpMessage, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
@@ -9,15 +8,17 @@ pub async fn server_index(
     req: HttpRequest,
     stream: web::Payload,
     srv: web::Data<server::ServerHandle>,
-    database: web::Data<Database>,
+    path: web::Path<i32>,
 ) -> Result<HttpResponse, Error> {
+    let room_id = path.into_inner();
+
     // The id was obtained from the token when authenticating
-    if let Some(id) = req.extensions().get::<i32>() {
+    if let Some(user_id) = req.extensions().get::<i32>() {
         return ws::start(
             session::Session {
-                id: *id,
+                user_id: *user_id,
                 srv: srv.get_ref().clone(),
-                database: database.get_ref().clone(),
+                room_id,
             },
             &req,
             stream,

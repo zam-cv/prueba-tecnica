@@ -94,8 +94,18 @@ impl Database {
             .await
     }
 
-    pub async fn get_rooms(&self) -> anyhow::Result<Vec<models::Room>> {
-        self.query_wrapper(move |conn| schema::rooms::table.load(conn))
-            .await
+    pub async fn get_rooms(&self) -> anyhow::Result<Vec<(i32, String, String, String, i32)>> {
+        self.query_wrapper(move |conn| {
+            schema::rooms::table
+                .select((
+                    schema::rooms::id,
+                    schema::rooms::title,
+                    schema::rooms::description,
+                    schema::rooms::front_image,
+                    schema::rooms::duration,
+                ))
+                .load(conn)
+        })
+        .await
     }
 }

@@ -1,7 +1,4 @@
-use crate::{
-    database::Database,
-    socket::server::{Command, ServerHandle},
-};
+use crate::socket::server::{Command, ServerHandle};
 use actix::prelude::*;
 use actix_web_actors::ws;
 
@@ -16,9 +13,9 @@ pub enum Response {
 }
 
 pub struct Session {
-    pub id: i32,
+    pub user_id: i32,
     pub srv: ServerHandle,
-    pub database: Database,
+    pub room_id: i32,
 }
 
 impl Handler<Response> for Session {
@@ -48,7 +45,7 @@ impl Actor for Session {
         if self
             .srv
             .tx
-            .send(Command::Connect(self.id, ctx.address()))
+            .send(Command::Connect(self.user_id, self.room_id, ctx.address()))
             .is_err()
         {
             ctx.stop();
@@ -57,7 +54,7 @@ impl Actor for Session {
 
     /// The function `stopping` sends a `Disconnect` message to an address and returns `Running::Stop`.
     fn stopping(&mut self, _: &mut Self::Context) -> Running {
-        let _ = self.srv.tx.send(Command::Disconnect(self.id));
+        let _ = self.srv.tx.send(Command::Disconnect(self.user_id));
         Running::Stop
     }
 }
@@ -88,7 +85,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for Session {
         };
 
         if let Some(message) = message {
-            let _ = self.srv.tx.send(Command::Message(self.id, message));
+            let _ = self.srv.tx.send(Command::Message(self.user_id, message));
         }
     }
 }

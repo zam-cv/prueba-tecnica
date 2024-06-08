@@ -4,13 +4,15 @@
     "description": "Description 1",
     "front_image": "front_image_example.jpg",
     "image": "image_example.jpg",
-    "duration": 1
+    "duration": 1,
+    "answer": "1234"
   },
   {
     "title": "Example 2",
     "description": "Description 2",
     "front_image": "front_image_example.jpg",
     "image": "image_example.jpg",
-    "duration": 1
+    "duration": 1,
+    "answer": "1234"
   }
 ]

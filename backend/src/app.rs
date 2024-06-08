@@ -5,6 +5,7 @@ use crate::{
     socket::{self, server::Server},
 };
 use actix_cors::Cors;
+use actix_files as fs;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_lab::middleware::from_fn;
 use std::env;
@@ -33,7 +34,7 @@ pub async fn app() -> std::io::Result<()> {
             .app_data(web::Data::new(database.clone()))
             // Routes
             .route(
-                "/ws/",
+                "/ws/{id}",
                 web::get()
                     .to(socket::server_index)
                     // Wrap the websocket route with the user_auth middleware
@@ -47,6 +48,10 @@ pub async fn app() -> std::io::Result<()> {
                             .wrap(from_fn(middlewares::auth))
                             .service(controllers::rooms::routes()),
                     ),
+            )
+            .service(
+                // Static files
+                fs::Files::new("/data/", "./data/").show_files_listing(),
             )
     })
     // Use the HOST and PORT environment variables to bind the server

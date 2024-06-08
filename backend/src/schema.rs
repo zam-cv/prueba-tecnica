@@ -12,6 +12,8 @@ diesel::table! {
         #[max_length = 100]
         image -> Varchar,
         duration -> Int4,
+        #[max_length = 200]
+        answer -> Varchar,
     }
 }
 

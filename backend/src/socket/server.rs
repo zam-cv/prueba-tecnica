@@ -8,7 +8,7 @@ use tokio::sync::mpsc;
 
 #[derive(Clone)]
 pub enum Command {
-    Connect(i32, Addr<Session>),
+    Connect(i32, i32, Addr<Session>),
     Disconnect(i32),
     Message(i32, String),
 }
@@ -25,18 +25,17 @@ pub struct Server {
 }
 
 pub struct State {
-    pub id: i32,
+    pub user_id: i32,
+    pub room_id: i32,
     pub connected_at: std::time::Instant,
     pub session: Addr<Session>,
 }
 
 impl State {
-    pub async fn new(
-        id: i32,
-        session: Addr<Session>
-    ) -> anyhow::Result<State> {
+    pub async fn new(user_id: i32, room_id: i32, session: Addr<Session>) -> anyhow::Result<State> {
         Ok(State {
-            id,
+            user_id,
+            room_id,
             connected_at: std::time::Instant::now(),
             session,
         })
@@ -57,55 +56,50 @@ impl Server {
         )
     }
 
-    async fn connect(&mut self, id: &i32, addr: &Addr<Session>) {
-        log::debug!("Connected: {}", id);
+    async fn connect(&mut self, user_id: &i32, room_id: &i32, addr: &Addr<Session>) {
+        log::debug!("Connected: {}", user_id);
 
         // if a connection already exists, it is rejected
-        if self.sessions.contains_key(id) {
-            log::debug!("Connection already exists: {}", id);
+        if self.sessions.contains_key(user_id) {
+            log::debug!("Connection already exists: {}", user_id);
             addr.do_send(Response::Stop);
 
             return;
         }
 
-        if let Ok(state) = State::new(*id, addr.clone()).await {
-            self.sessions.insert(*id, state);
+        if let Ok(state) = State::new(*user_id, *room_id, addr.clone()).await {
+            self.sessions.insert(*user_id, state);
         } else {
-            log::error!("Failed to get user: {}", id);
+            log::error!("Failed to get user: {}", user_id);
             addr.do_send(Response::Stop);
         }
     }
 
-    async fn disconnect(&mut self, id: &i32) {
-        log::debug!("Disconnected: {}", id);
-
-        if let Some(mut state) = self.sessions.remove(id) {
-            // Save the state in the database at the end of the session
-            // let _ = state.save(&self.database).await;
+    async fn disconnect(&mut self, user_id: &i32) {
+        if let Some(state) = self.sessions.remove(user_id) {
+            log::debug!("Disconnected in {}: {}", state.room_id, user_id);
         }
     }
 
-    async fn message(&mut self, id: &i32, text: &String) {
-        log::debug!("Message from {}: {}", id, text);
+    async fn message(&mut self, user_id: &i32, text: &String) {
+        log::debug!("Message from {}: {}", user_id, text);
 
-        if let Some(state) = self.sessions.get_mut(id) {
-            // if let Err(err) = state.handle_message(text, &self.database).await {
-            //     log::error!("Failed to handle message: {}", err);
-            // }
+        if let Some(state) = self.sessions.get_mut(user_id) {
+            log::debug!("Message in {}: {}", state.room_id, text);
         }
     }
 
     pub async fn run(&mut self) {
         while let Some(cmd) = self.rx.recv().await {
             match &cmd {
-                Command::Connect(id, addr) => {
-                    self.connect(id, addr).await;
+                Command::Connect(user_id, room_id, addr) => {
+                    self.connect(user_id, room_id, addr).await;
                 }
-                Command::Disconnect(id) => {
-                    self.disconnect(id).await;
+                Command::Disconnect(user_id) => {
+                    self.disconnect(user_id).await;
                 }
-                Command::Message(id, text) => {
-                    self.message(id, text).await;
+                Command::Message(user_id, text) => {
+                    self.message(user_id, text).await;
                 }
             }
         }
