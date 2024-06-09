@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  db-server:
+    image: postgres:13
+    env_file:
+      - ./backend/.env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: awdrqwer12
+      POSTGRES_DB: tctc
+    profiles:
+      - prod
+
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - cargo-cache:/usr/local/cargo
+    environment:
+      DATABASE_HOST: db-server
+      DATABASE_URL: postgres://admin:awdrqwer12@db-server:5432/tctc
+    profiles:
+      - prod
+
+volumes:
+  db-data:
+  cargo-cache:
