@@ -21,7 +21,7 @@ pub struct Room {
     #[validate(length(min = 1, max = 100))]
     pub image: String,
     pub duration: i32,
-    #[validate(length(min = 1, max = 100))]
+    #[validate(length(max = 100))]
     pub example: String,
     #[validate(length(min = 1, max = 200))]
     pub answer: String,

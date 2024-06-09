@@ -144,13 +144,15 @@ export default function Room() {
             </div>
           </div>
           <div className="flex justify-center">
-            {image && (
-              <img
-                src={`${RESOURCES_URL}/${image}`}
-                alt={title}
-                className="h-full object-contain object-top"
-              />
-            )}
+            <div className="relative h-full w-full">
+              {image && (
+                <img
+                  src={`${RESOURCES_URL}/${image}`}
+                  alt={title}
+                  className="h-full w-full object-contain object-top absolute"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

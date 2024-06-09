@@ -6,9 +6,13 @@ use crate::{
 };
 use actix_cors::Cors;
 use actix_files as fs;
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{middleware::Logger, web, App, HttpServer, Responder, Result};
 use actix_web_lab::middleware::from_fn;
 use std::env;
+
+async fn index() -> Result<impl Responder> {
+    Ok(fs::NamedFile::open("./page/index.html")?.customize())
+}
 
 pub async fn app() -> std::io::Result<()> {
     // Create Database instance
@@ -56,6 +60,8 @@ pub async fn app() -> std::io::Result<()> {
                     .show_files_listing()
                     .index_file("index.html"),
             )
+            // if it doesn't find the route
+            .default_service(web::get().to(index))
     })
     // Use the HOST and PORT environment variables to bind the server
     .bind(format!(

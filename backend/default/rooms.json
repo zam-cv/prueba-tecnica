@@ -1,20 +1,20 @@
 [
   {
-    "title": "Example 1",
-    "description": "Description 1",
+    "title": "Suma Alfanumérica",
+    "description": "Cada letra representa un dígito desconocido que debe ser descubierto. El reto propone un enigma donde se debe determinar el valor de estas letras bajo una condición específica.",
     "front_image": "front_image_example.jpg",
     "image": "image_example.jpg",
     "duration": 1,
     "example": "1, 2, 3, 4",
-    "answer": "1234"
+    "answer": "4, 3, 1, 0"
   },
   {
-    "title": "Example 2",
-    "description": "Description 2",
-    "front_image": "front_image_example.jpg",
-    "image": "image_example.jpg",
+    "title": "Cifrado Oculto",
+    "description": "Cada carácter representa una letra codificada que debe ser descifrada. El reto propone un enigma donde se debe determinar el mensaje original de este cifrado.",
+    "front_image": "estatua.jpg",
+    "image": "cesar.jpg",
     "duration": 1,
-    "example": "5",
-    "answer": "1234"
+    "example": "",
+    "answer": "has ganado"
   }
 ]
