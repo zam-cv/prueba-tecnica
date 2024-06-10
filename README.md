@@ -20,4 +20,5 @@ cd prueba-tecnica
 ```bash
 # prueba-tecnica/
 docker-compose --profile prod up
+# access http://localhost:8080
 ```

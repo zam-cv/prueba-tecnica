@@ -28,6 +28,14 @@ pub async fn app() -> std::io::Result<()> {
     tokio::spawn(async move { socket_server.run().await });
     log::info!("Socket server started");
 
+    // Get the HOST and PORT environment variables
+    let host = env::var("HOST").unwrap_or("0.0.0.0".to_string());
+    let port = env::var("PORT").unwrap_or("8080".to_string());
+
+    // Start the HTTP server
+    log::info!("Starting the server");
+    log::info!("Listening on http://{}:{}", host, port);
+
     HttpServer::new(move || {
         App::new()
             // Enable the logger and CORS middleware
@@ -64,11 +72,7 @@ pub async fn app() -> std::io::Result<()> {
             .default_service(web::get().to(index))
     })
     // Use the HOST and PORT environment variables to bind the server
-    .bind(format!(
-        "{}:{}",
-        env::var("HOST").unwrap_or("0.0.0.0".to_string()),
-        env::var("PORT").unwrap_or("8080".to_string())
-    ))?
+    .bind(format!("{}:{}", host, port))?
     .run()
     .await
 }
