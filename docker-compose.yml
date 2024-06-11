@@ -2,8 +2,6 @@ version: '3.8'
 services:
   db-server:
     image: postgres:13
-    env_file:
-      - ./backend/.env
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -17,8 +15,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - ./backend/.env
     depends_on:
       - db-server
     ports:
@@ -26,6 +22,10 @@ services:
     volumes:
       - cargo-cache:/usr/local/cargo
     environment:
+      RUST_LOG: debug
+      HOST: 0.0.0.0
+      PORT: 8080
+      SECRET_KEY: secret_key
       DATABASE_HOST: db-server
       DATABASE_URL: postgres://admin:awdrqwer12@db-server:5432/tctc
     profiles:
