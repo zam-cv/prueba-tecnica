@@ -34,7 +34,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     if !home.join("prueba-tecnica").exists() {
-        cmd!("git", "clone", "https://github.com/zam-cv/prueba-tecnica").run()?;
+        let _ = cmd!("git", "clone", "https://github.com/zam-cv/prueba-tecnica").run();
     }
 
     env::set_current_dir(home.join("prueba-tecnica"))?;
@@ -59,48 +59,62 @@ fn main() -> anyhow::Result<()> {
 #[allow(dead_code)]
 fn install_on_windows() -> anyhow::Result<()> {
     // Install Chocolatey
-    if let Err(_) = which("choco") {
+    if which("choco").is_err() {
+        cmd!(
+            "powershell",
+            "-Command",
+            "Set-ExecutionPolicy Bypass -Scope Process -Force"
+        )
+        .run()?;
+
+        if std::fs::metadata("C:\\ProgramData\\chocolatey").is_ok() {
+            cmd!("rmdir", "/s", "/q", "C:\\ProgramData\\chocolatey").run()?;
+        }
+
         cmd!("powershell", "-Command", "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))")
             .run()?;
     }
 
     // Install Docker Desktop
-    cmd!("choco", "install", "docker-desktop", "-y").run()?;
+    if which("docker").is_err() {
+        cmd!("choco", "install", "docker-desktop", "-y").run()?;
+    }
+
+    println!("Loading Docker Desktop, please wait...");
+    let _ = cmd!("start", "docker-desktop").run();
+    std::thread::sleep(std::time::Duration::from_secs(60));
 
     // Install Docker Compose
-    cmd!("choco", "install", "docker-compose", "-y").run()?;
+    if which("docker-compose").is_err() {
+        let _ = cmd!("choco", "install", "docker-compose", "-y").run();
+    }
 
     // Install Git
-    cmd!("choco", "install", "git", "-y").run()?;
+    if which("git").is_err() {
+        let _ = cmd!("choco", "install", "git", "-y").run();
+    }
 
     Ok(())
 }
 
 #[allow(dead_code)]
 fn install_on_linux() -> anyhow::Result<()> {
-    cmd!("sudo", "apt-get", "update").run()?;
+    let _ = cmd!("sudo", "apt-get", "update").run();
 
     // Install Docker
-    cmd!("sudo", "apt-get", "install", "docker.io", "-y").run()?;
-    cmd!("sudo", "systemctl", "start", "docker").run()?;
-    cmd!("sudo", "systemctl", "enable", "docker").run()?;
-    cmd!("sudo", "usermod", "-aG", "docker", "$USER").run()?;
-    cmd!("newgrp", "docker").run()?;
+    if which("docker").is_err() {
+        cmd!("sudo", "apt-get", "install", "docker.io", "-y").run()?;
+    }
 
     // Install Docker Compose
-    cmd!("sudo", "apt-get", "install", "docker-compose", "-y").run()?;
-    cmd!(
-        "sudo",
-        "ln",
-        "-s",
-        "/usr/bin/docker-compose",
-        "/usr/local/bin/docker-compose"
-    )
-    .run()?;
-    cmd!("sudo", "chmod", "+x", "/usr/local/bin/docker-compose").run()?;
+    if which("docker-compose").is_err() {
+        cmd!("sudo", "apt-get", "install", "docker-compose", "-y").run()?;
+    }
 
     // Install Git
-    cmd!("sudo", "apt-get", "install", "git", "-y").run()?;
+    if which("git").is_err() {
+        cmd!("sudo", "apt-get", "install", "git", "-y").run()?;
+    }
 
     Ok(())
 }
@@ -108,25 +122,34 @@ fn install_on_linux() -> anyhow::Result<()> {
 #[allow(dead_code)]
 fn install_on_macos() -> anyhow::Result<()> {
     // Install Homebrew
-    if let Err(_) = which("brew") {
-        cmd!(
+    if which("brew").is_err() {
+        let _ = cmd!(
             "/bin/bash",
             "-c",
             "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         )
-        .run()?;
+        .run();
 
-        cmd!("brew", "update").run()?;
+        let _ = cmd!("brew", "update").run();
     }
 
-    // Install Docker Desktop
-    cmd!("brew", "install", "docker").run()?;
+    if which("docker").is_err() {
+        let _ = cmd!("brew", "install", "--cask", "docker").run();
+    }
+    
+    println!("Loading Docker Desktop, please wait...");
+    let _ = cmd!("open", "/Applications/Docker.app").run();
+    std::thread::sleep(std::time::Duration::from_secs(60));
 
     // Install Docker Compose
-    cmd!("brew", "install", "docker-compose").run()?;
+    if which("docker-compose").is_err() {
+        let _ = cmd!("brew", "install", "docker-compose").run();
+    }
 
     // Install Git
-    cmd!("brew", "install", "git").run()?;
+    if which("git").is_err() {
+        let _ = cmd!("brew", "install", "git").run();
+    }
 
     Ok(())
 }

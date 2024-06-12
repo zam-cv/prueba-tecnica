@@ -45,8 +45,10 @@ COPY backend/diesel.toml .
 
 EXPOSE 8080
 
-COPY entrypoint.sh /usr/src/app/entrypoint.sh
-RUN chmod +x /usr/src/app/entrypoint.sh
+WORKDIR /usr/src/app/
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
+WORKDIR /usr/src/app/backend
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
 CMD ["app"]
